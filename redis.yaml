@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Create the Redis cache cluster.
+
+Parameters:
+  VPC:
+    Description: VPC
+    Type: AWS::EC2::VPC::Id
+
+  SubnetIds:
+    Description: Subnet Ids
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  CacheSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: Redis-Cache-Security-Group-TODO
+      GroupDescription: Redis cache security group
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: 0.0.0.0/0
+  
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Redis cache subnet group
+      SubnetIds: !Ref SubnetIds
+
+  ElasticCache:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: cache.t2.micro
+      CacheSubnetGroupName: !Ref CacheSubnetGroup
+      Engine: redis
+      NumCacheNodes: 1
+      VpcSecurityGroupIds:
+        - !Ref CacheSecurityGroup
+
+Outputs:
+  CacheAddress:
+    Value: !GetAtt ElasticCache.RedisEndpoint.Address
+    Description: Redis DNS name
+  

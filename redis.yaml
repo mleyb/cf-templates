@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: Create the Redis cache cluster.
+Description: Creates a Redis cache cluster.
 
 Parameters:
   VPC:
